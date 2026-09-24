@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teyvat Battle Arena</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    overflow-x: hidden;
+    background:
+        radial-gradient(circle at 20% 20%, #5e78ff55, transparent 30%),
+        radial-gradient(circle at 80% 80%, #ff8bdf44, transparent 30%),
+        linear-gradient(135deg, #10152e, #1b1230 50%, #0b1020);
+}
+
+/* ---------- Background ---------- */
+
+.bg {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    opacity: .6;
+    animation: twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle {
+    from { opacity: .15; transform: scale(.7); }
+    to { opacity: 1; transform: scale(1.4); }
+}
+
+/* ---------- Header ---------- */
+
+header {
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6%;
+    border-bottom: 1px solid #ffffff18;
+    background: #090d1dcc;
+    backdrop-filter: blur(15px);
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: #fff;
+}
+
+.logo span {
+    color: #7edcff;
+}
+
+.energy-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.energy {
+    width: 150px;
+    height: 9px;
+    border-radius: 20px;
+    background: #ffffff18;
+    overflow: hidden;
+}
+
+.energy-fill {
+    height: 100%;
+    width: 65%;
+    background: linear-gradient(90deg, #5ee7ff, #b56cff);
+    box-shadow: 0 0 15px #7c8cff;
+    transition: .4s;
+}
+
+/* ---------- Main ---------- */
+
+main {
+    width: min(1200px, 94%);
+    margin: 30px auto;
+}
+
+.arena {
+    min-height: 650px;
+    position: relative;
+    padding: 30px;
+    border: 1px solid #ffffff20;
+    border-radius: 30px;
+    background: #ffffff09;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 30px 80px #0008;
+    overflow: hidden;
+}
+
+.arena::before {
+    content: "";
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: #6d5dfc22;
+    border-radius: 50%;
+    filter: blur(80px);
+    left: -200px;
+    bottom: -200px;
+}
+
+.arena::after {
+    content: "";
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: #ff67c422;
+    border-radius: 50%;
+    filter: blur(100px);
+    right: -200px;
+    top: -200px;
+}
+
+/* ---------- Battle ---------- */
+
+.battle {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+    min-height: 420px;
+}
+
+.fighter {
+    text-align: center;
+}
+
+.enemy {
+    transform: scale(.95);
+}
+
+.character-art {
+    width: 230px;
+    height: 270px;
+    margin: auto;
+    border-radius: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 130px;
+    background:
+        linear-gradient(145deg, #ffffff18, #ffffff04);
+    border: 1px solid #ffffff25;
+    box-shadow:
+        inset 0 0 50px #ffffff08,
+        0 20px 50px #0007;
+    transition: .4s;
+}
+
+.character-art:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+.enemy .character-art {
+    border-color: #ff4e8366;
+    box-shadow:
+        0 0 40px #ff3f6430,
+        inset 0 0 50px #ff3f6410;
+}
+
+.character-name {
+    font-size: 25px;
+    font-weight: 800;
+    margin-top: 15px;
+}
+
+.element {
+    margin-top: 5px;
+    color: #b9b9d5;
+}
+
+/* ---------- HP ---------- */
+
+.hp-container {
+    width: min(320px, 90%);
+    margin: 15px auto;
+}
+
+.hp-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.hp {
+    height: 13px;
+    background: #ffffff18;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.hp-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #35ed9c, #a1ff70);
+    border-radius: inherit;
+    transition: width .5s ease;
+}
+
+.enemy .hp-fill {
+    background: linear-gradient(90deg, #ff526d, #ff9b58);
+}
+
+/* ---------- VS ---------- */
+
+.vs {
+    position: absolute;
+    left: 50%;
+    top: 47%;
+    transform: translate(-50%, -50%);
+    font-size: 50px;
+    font-weight: 1000;
+    color: #ffffff20;
+    text-shadow: 0 0 30px #fff3;
+}
+
+/* ---------- Controls ---------- */
+
+.controls {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+button {
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-weight: 800;
+    padding: 14px 23px;
+    border-radius: 14px;
+    background: #ffffff12;
+    border: 1px solid #ffffff20;
+    transition: .2s;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    background: #ffffff20;
+    box-shadow: 0 10px 30px #0005;
+}
+
+button:active {
+    transform: scale(.95);
+}
+
+.attack {
+    background: linear-gradient(135deg, #566cff, #9c55ff);
+}
+
+.skill {
+    background: linear-gradient(135deg, #08bde7, #596cff);
+}
+
+.ultimate {
+    background: linear-gradient(135deg, #ff4f8b, #ff9255);
+}
+
+/* ---------- Character Select ---------- */
+
+.select-title {
+    position: relative;
+    z-index: 3;
+    margin: 35px 0 15px;
+    font-size: 22px;
+}
+
+.characters {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.card {
+    cursor: pointer;
+    padding: 16px;
+    border-radius: 18px;
+    background: #ffffff0a;
+    border: 1px solid #ffffff15;
+    transition: .25s;
+    text-align: center;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    background: #ffffff15;
+}
+
+.card.active {
+    border-color: #72e9ff;
+    box-shadow: 0 0 25px #4be9ff35;
+}
+
+.avatar {
+    height: 110px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 65px;
+    border-radius: 15px;
+    background: #ffffff08;
+    margin-bottom: 10px;
+}
+
+.card h3 {
+    font-size: 16px;
+}
+
+.card p {
+    color: #999dbb;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* ---------- Log ---------- */
+
+.log {
+    position: relative;
+    z-index: 3;
+    margin-top: 25px;
+    padding: 15px;
+    height: 100px;
+    overflow-y: auto;
+    border-radius: 15px;
+    background: #0005;
+    border: 1px solid #ffffff12;
+    font-size: 14px;
+}
+
+.log p {
+    margin-bottom: 5px;
+    color: #cdd2ef;
+}
+
+/* ---------- Damage ---------- */
+
+.damage {
+    position: fixed;
+    pointer-events: none;
+    font-size: 40px;
+    font-weight: 1000;
+    color: #ff5d6d;
+    text-shadow: 0 0 15px #ff304c;
+    z-index: 100;
+    animation: damage 1s forwards;
+}
+
+@keyframes damage {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(.5);
+    }
+
+    30% {
+        opacity: 1;
+        transform: translateY(0) scale(1.2);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-100px) scale(1);
+    }
+}
+
+/* ---------- Win ---------- */
+
+.result {
+    position: fixed;
+    inset: 0;
+    background: #050713dd;
+    backdrop-filter: blur(12px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+}
+
+.result.show {
+    display: flex;
+}
+
+.result-box {
+    width: min(450px, 90%);
+    text-align: center;
+    padding: 45px 30px;
+    border-radius: 30px;
+    background: #151a35ee;
+    border: 1px solid #ffffff20;
+    box-shadow: 0 30px 100px #000b;
+}
+
+.result-box h1 {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.result-box p {
+    color: #afb4d2;
+    margin-bottom: 25px;
+}
+
+/* ---------- Mobile ---------- */
+
+@media(max-width: 750px) {
+
+    header {
+        padding: 0 4%;
+    }
+
+    .logo {
+        font-size: 18px;
+    }
+
+    .energy-box {
+        display: none;
+    }
+
+    .arena {
+        padding: 18px;
+    }
+
+    .battle {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .enemy {
+        order: -1;
+    }
+
+    .vs {
+        display: none;
+    }
+
+    .character-art {
+        width: 170px;
+        height: 190px;
+        font-size: 90px;
+    }
+
+    .characters {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg" id="stars"></div>
+
+<header>
+    <div class="logo">TEYVAT <span>ARENA</span></div>
+
+    <div class="energy-box">
+        <span>⚡ Energy</span>
+        <div class="energy">
+            <div class="energy-fill" id="energy"></div>
+        </div>
+    </div>
+</header>
+
+<main>
+
+<section class="arena">
+
+    <div class="battle">
+
+        <!-- PLAYER -->
+        <div class="fighter player">
+
+            <div class="character-art" id="playerArt">🌸</div>
+
+            <div class="character-name" id="playerName">
+                Nilou
+            </div>
+
+            <div class="element" id="playerElement">
+                Hydro • Dancer
+            </div>
+
+            <div class="hp-container">
+
+                <div class="hp-top">
+                    <span>HP</span>
+                    <span id="playerHpText">1000 / 1000</span>
+                </div>
+
+                <div class="hp">
+                    <div
+                        class="hp-fill"
+                        id="playerHp">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="vs">VS</div>
+
+        <!-- ENEMY -->
+        <div class="fighter enemy">
+
+            <div class="character-art" id="enemyArt">🔥</div>
+
+            <div class="character-name">
+                Pyro Abyss
+            </div>
+
+            <div class="element">
+                Pyro • Enemy
+            </div>
+
+            <div class="hp-container">
+
+                <div class="hp-top">
+                    <span>HP</span>
+                    <span id="enemyHpText">1200 / 1200</span>
+                </div>
+
+                <div class="hp">
+                    <div
+                        class="hp-fill"
+                        id="enemyHp">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="controls">
+
+        <button class="attack" onclick="attack()">
+            ⚔️ Normal Attack
+        </button>
+
+        <button class="skill" onclick="skill()">
+            💧 Elemental Skill
+        </button>
+
+        <button class="ultimate" onclick="ultimate()">
+            ✨ Ultimate
+        </button>
+
+    </div>
+
+    <h2 class="select-title">
+        Choose Your Character
+    </h2>
+
+    <div class="characters">
+
+        <div
+            class="card active"
+            onclick="selectCharacter('Nilou', '🌸', 'Hydro • Dancer', 1000, 130, this)"
+        >
+            <div class="avatar">🌸</div>
+            <h3>Nilou</h3>
+            <p>Hydro</p>
+        </div>
+
+        <div
+            class="card"
+            onclick="selectCharacter('Raiden', '⚡', 'Electro • Archon', 1100, 150, this)"
+        >
+            <div class="avatar">⚡</div>
+            <h3>Raiden Shogun</h3>
+            <p>Electro</p>
+        </div>
+
+        <div
+            class="card"
+            onclick="selectCharacter('Hu Tao', '🔥', 'Pyro • Director', 900, 170, this)"
+        >
+            <div class="avatar">🔥</div>
+            <h3>Hu Tao</h3>
+            <p>Pyro</p>
+        </div>
+
+        <div
+            class="card"
+            onclick="selectCharacter('Furina', '💧', 'Hydro • Focalors', 1050, 145, this)"
+        >
+            <div class="avatar">💧</div>
+            <h3>Furina</h3>
+            <p>Hydro</p>
+        </div>
+
+    </div>
+
+    <div class="log" id="log">
+        <p>⚔️ The battle has begun!</p>
+        <p>✨ Choose an ability to attack the Pyro Abyss.</p>
+    </div>
+
+</section>
+
+</main>
+
+<div class="result" id="result">
+
+    <div class="result-box">
+
+        <h1 id="resultTitle">
+            Victory!
+        </h1>
+
+        <p id="resultText">
+            You defeated the enemy.
+        </p>
+
+        <button onclick="restart()">
+            🔄 Play Again
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+const characters = {
+    Nilou: {
+        emoji: "🌸",
+        element: "Hydro • Dancer",
+        hp: 1000,
+        damage: 130
+    },
+
+    Raiden: {
+        emoji: "⚡",
+        element: "Electro • Archon",
+        hp: 1100,
+        damage: 150
+    },
+
+    "Hu Tao": {
+        emoji: "🔥",
+        element: "Pyro • Director",
+        hp: 900,
+        damage: 170
+    },
+
+    Furina: {
+        emoji: "💧",
+        element: "Hydro • Focalors",
+        hp: 1050,
+        damage: 145
+    }
+};
+
+let player = {
+    name: "Nilou",
+    hp: 1000,
+    maxHp: 1000,
+    damage: 130
+};
+
+let enemy = {
+    hp: 1200,
+    maxHp: 1200
+};
+
+let energy = 65;
+let gameOver = false;
+
+/* ---------- Stars ---------- */
+
+const stars = document.getElementById("stars");
+
+for(let i = 0; i < 80; i++){
+
+    const star = document.createElement("div");
+
+    star.className = "star";
+
+    star.style.left = Math.random() * 100 + "%";
+    star.style.top = Math.random() * 100 + "%";
+
+    star.style.animationDelay =
+        Math.random() * 2 + "s";
+
+    stars.appendChild(star);
+}
+
+/* ---------- Character ---------- */
+
+function selectCharacter(
+    name,
+    emoji,
+    element,
+    hp,
+    damage,
+    card
+){
+
+    if(gameOver) return;
+
+    player.name = name;
+    player.hp = hp;
+    player.maxHp = hp;
+    player.damage = damage;
+
+    document.getElementById("playerArt").textContent = emoji;
+    document.getElementById("playerName").textContent = name;
+    document.getElementById("playerElement").textContent = element;
+
+    document
+        .querySelectorAll(".card")
+        .forEach(c => c.classList.remove("active"));
+
+    card.classList.add("active");
+
+    updateUI();
+
+    addLog(`✨ You selected ${name}!`);
+}
+
+/* ---------- Attack ---------- */
+
+function attack(){
+
+    if(gameOver) return;
+
+    const damage =
+        Math.floor(player.damage * (.85 + Math.random() * .3));
+
+    enemy.hp -= damage;
+
+    energy = Math.min(100, energy + 10);
+
+    showDamage(damage, true);
+
+    addLog(
+        `⚔️ ${player.name} dealt ${damage} damage!`
+    );
+
+    updateUI();
+
+    checkBattle();
+
+    if(!gameOver){
+
+        setTimeout(enemyTurn, 700);
+
+    }
+}
+
+/* ---------- Skill ---------- */
+
+function skill(){
+
+    if(gameOver) return;
+
+    const damage =
+        Math.floor(player.damage * 1.6);
+
+    enemy.hp -= damage;
+
+    energy = Math.min(100, energy + 5);
+
+    showDamage(damage, true);
+
+    addLog(
+        `💧 ${player.name} used Elemental Skill for ${damage} damage!`
+    );
+
+    updateUI();
+
+    checkBattle();
+
+    if(!gameOver){
+
+        setTimeout(enemyTurn, 700);
+
+    }
+}
+
+/* ---------- Ultimate ---------- */
+
+function ultimate(){
+
+    if(gameOver) return;
+
+    if(energy < 50){
+
+        addLog("⚡ Not enough Energy!");
+
+        return;
+    }
+
+    const damage =
+        Math.floor(player.damage * 2.8);
+
+    enemy.hp -= damage;
+
+    energy = 0;
+
+    showDamage(damage, true);
+
+    addLog(
+        `✨ ${player.name} unleashed an ULTIMATE for ${damage} damage!`
+    );
+
+    updateUI();
+
+    checkBattle();
+
+    if(!gameOver){
+
+        setTimeout(enemyTurn, 800);
+
+    }
+}
+
+/* ---------- Enemy ---------- */
+
+function enemyTurn(){
+
+    if(gameOver) return;
+
+    const damage =
+        Math.floor(70 + Math.random() * 55);
+
+    player.hp -= damage;
+
+    player.hp = Math.max(0, player.hp);
+
+    showDamage(damage, false);
+
+    addLog(
+        `🔥 Pyro Abyss attacked for ${damage} damage!`
+    );
+
+    updateUI();
+
+    checkBattle();
+}
+
+/* ---------- UI ---------- */
+
+function updateUI(){
+
+    const playerPercent =
+        Math.max(0, player.hp / player.maxHp * 100);
+
+    const enemyPercent =
+        Math.max(0, enemy.hp / enemy.maxHp * 100);
+
+    document.getElementById("playerHp").style.width =
+        playerPercent + "%";
+
+    document.getElementById("enemyHp").style.width =
+        enemyPercent + "%";
+
+    document.getElementById("playerHpText").textContent =
+        `${player.hp} / ${player.maxHp}`;
+
+    document.getElementById("enemyHpText").textContent =
+        `${Math.max(0, enemy.hp)} / ${enemy.maxHp}`;
+
+    document.getElementById("energy").style.width =
+        energy + "%";
+}
+
+/* ---------- Battle Result ---------- */
+
+function checkBattle(){
+
+    if(enemy.hp <= 0){
+
+        gameOver = true;
+
+        document.getElementById("resultTitle").textContent =
+            "✨ Victory!";
+
+        document.getElementById("resultText").textContent =
+            `${player.name} defeated the Pyro Abyss!`;
+
+        document
+            .getElementById("result")
+            .classList.add("show");
+
+        return;
+    }
+
+    if(player.hp <= 0){
+
+        gameOver = true;
+
+        document.getElementById("resultTitle").textContent =
+            "💀 Defeated";
+
+        document.getElementById("resultText").textContent =
+            "The Pyro Abyss was stronger this time.";
+
+        document
+            .getElementById("result")
+            .classList.add("show");
+    }
+}
+
+/* ---------- Damage Effect ---------- */
+
+function showDamage(amount, enemyTarget){
+
+    const damage = document.createElement("div");
+
+    damage.className = "damage";
+
+    damage.textContent = "-" + amount;
+
+    damage.style.left =
+        enemyTarget ? "70%" : "25%";
+
+    damage.style.top = "45%";
+
+    document.body.appendChild(damage);
+
+    setTimeout(() => {
+        damage.remove();
+    }, 1000);
+}
+
+/* ---------- Log ---------- */
+
+function addLog(message){
+
+    const log =
+        document.getElementById("log");
+
+    const p =
+        document.createElement("p");
+
+    p.textContent = message;
+
+    log.appendChild(p);
+
+    log.scrollTop = log.scrollHeight;
+}
+
+/* ---------- Restart ---------- */
+
+function restart(){
+
+    enemy.hp = enemy.maxHp;
+
+    const data = characters[player.name];
+
+    player.hp = data.hp;
+    player.maxHp = data.hp;
+    player.damage = data.damage;
+
+    energy = 65;
+
+    gameOver = false;
+
+    document
+        .getElementById("result")
+        .classList.remove("show");
+
+    addLog("🔄 A new battle has started!");
+
+    updateUI();
+}
+
+updateUI();
+
+</script>
+
+</body>
+</html>
